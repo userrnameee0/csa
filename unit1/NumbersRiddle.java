@@ -4,7 +4,7 @@
  |      
  |  Course Name:  AP Computer Science A
  |   Instructor:  Mr. Jonathan Virak
- |     Due Date:  unknown
+ |     Due Date:  9-27-24
  |
  |  Description:  The program asks for a number, and inputs it into a series
  |                of arithmetic operations that can be described as a function
@@ -14,7 +14,9 @@
  |
  |     Language:  [java]           
  |                
- | Deficiencies:  None, the program runs correctly and implements fail safety
+ | Deficiencies:  When the number inputted requires narrowing (inputting
+ |                a very, very large number) the result is not 3.0. Instead
+ |                it seems to become `0.0` or `NaN`
  *===========================================================================*/
 
 import java.util.function.Function;
@@ -26,51 +28,73 @@ public class NumbersRiddle {
     private static double number;
 
     public static void main(String[] args) {
-        // hook to the riddle
+        // intro/hook to the riddle
         System.out.println("choose any number, double it, add six, divide it in half, and subtract the number you started with. the answer is always three!");
-        // keep asking the user until they input a number (or something that evaluates to a double)
-        double originalNum = askQuestion("welcome to the numbers riddle! any number entered will result in three! enter a starting number to begin", Double::valueOf);
-        // record the original unmodified number for the last step
+        
+        // keep asking the user until they input a number (something that evaluates to a double)
+        double originalNum = askQuestion("welcome to the numbers riddle! enter a starting number to begin", Double::valueOf);
         number = originalNum;
         
         
-        // follow the steps described with the help of `evalNumberExpr` to explain it to the user
-        // multiply by 2
-        evalNumberExpr("multiply", 2, '*', x -> x * 2);
-        // add by 6
-        evalNumberExpr("add", 6, '+', x -> x + 6);
-        // divide by 2
-        evalNumberExpr("divide", 2, '/', x -> x / 2);
-        // and subtract by the original number
-        evalNumberExpr("use the original number and subtract", originalNum, '-', x -> x - originalNum);
+        // follow the steps described to prove it to the user
+        mul(2);            // double it
+        add(6);            // add six
+        mul(1 / 2.0);      // divide it in half
+        add(-originalNum); // and subtract the number you started with
         
-        // return the result of the arithmetic sequence, which is three
+        // return the result of the arithmetic sequence, which should be three
         System.out.println("voila! you ended up with " + number);
     }
+    
+    // describes the process of addition/subtraction depending on the value
+    private static void add(double quantity) {
+        if (quantity > 0) {
+            evalStartOfNumberExpr("add", quantity, '+');
+        
+        } else {
+            // inputs are reversed because `x - num` is better than `x + -num`
+            evalStartOfNumberExpr("subtract", -quantity, '-');
+        }
 
-    // describes an arithmetic operation to the riddle number provided at the start
-    // `arithmeticDesc` is the word to describe the operation
-    // `quantity` is what the number will be evaluated against (what is on the right of the operation)
-    // `exprType` is the math symbol for the operation
-    // `expr` is a lambda function which applies the operation to number
-    private static void evalNumberExpr(String arithmeticDesc, double quantity, char exprType, Function<Double, Double> expr) {
-        // first tell that itll <arithmeticDesc> <number> by <quantity>
+        number += quantity;
+        evalEndOfNumberExpr();
+    }
+
+    // describes the process of multiplication/division depending on the value
+    private static void mul(double quantity) {
+        if (quantity > 1) {
+            evalStartOfNumberExpr("multiply", quantity, '*');
+            
+        } else {
+            // inputs are reversed because `x / num` is better than `x * 1/num`
+            evalStartOfNumberExpr("divide", 1.0 / quantity, '/');
+        }
+
+        number *= quantity;
+        evalEndOfNumberExpr();
+    }
+    
+    // describes the first part of the arithmetic operation to the riddle number
+    // the parameters fill in the blanks of the equation
+    private static void evalStartOfNumberExpr(String arithmeticDesc, double quantity, char exprType) {
+        // first tell that itll '<arithmeticDesc> <number> by <quantity>'
         System.out.println(String.format("lets %s %2$.1f by %3$.1f", arithmeticDesc, number, quantity));
-        // then print out the first half of the equation, <number> <exprType> <quantity> = ...
+
+        // then print out the first half of the equation, '<number> <exprType> <quantity> = ...'
         System.out.print(String.format("%1$.1f %2$s %3$.1f = ", number, exprType, quantity));
-        number = expr.apply(number);
-        // then fill out the result, or what number is now after the `expr` was applied
-        System.out.println(String.format("%.2f", number));
+    }
+    
+    // prints out the 2nd half of the equation from `evalStartOfNumberExpr` after the number is updated
+    // to not flood the outputs, a question is asked to pause it
+    private static void evalEndOfNumberExpr() {
+        System.out.println(String.format("%.1f", number));
         System.out.print('\n');
 
-        // to not flood the outputs, a question is asked to pause the output
         askQuestion("makes sense right? (enter to continue)", r -> true);
     }
 
-    // generic way to ask a question through the output
-    // `question` is what the user reads and responds to
-    // `check` is given the user input and attempts to validate 
-    //         it through a function. the function must not crash to pass
+    // generic way to ask a `question` through the output
+    // when the response is `check`ed, the function must not crash and return the answer
     private static <T> T askQuestion(String question, Function<String, T> check) {
         System.out.println(question);
 
