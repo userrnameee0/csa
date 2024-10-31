@@ -1,56 +1,35 @@
-/*=============================================================================
- |   Assignment:  Project 1.6 Numbers Riddle
- |       Author:  Issai Catano
- |      
- |  Course Name:  AP Computer Science A
- |   Instructor:  Mr. Jonathan Virak
- |     Due Date:  9-27-24
- |
- |  Description:  The program asks for a number, and inputs it into a series
- |                of arithmetic operations that can be described as a function
- |                where `f(x) = (2x + 6) / 2 - x`. The program goes through
- |                each operation individually, and proves it always evaluates
- |                to `f(x) = 3` when the number given is substituted for x.
- |
- |     Language:  [java]           
- |                
- | Deficiencies:  When the number inputted requires narrowing (inputting
- |                a very, very large number) the result is not 3.0. Instead
- |                it seems to become `0.0` or `NaN`
- *===========================================================================*/
+// NumbersRiddle, but uses f(x) = (x + 5) * 2 - x - x = 10
+// Unit concept related comments start with # CONCEPT #
 
 import java.util.function.Function;
 import java.util.Scanner;
 
 public class NumbersRiddle {
     // define our Scanner to recieve input and number for the riddle itself
+    // # CONCEPT # use of primitive (double) and non-primitive (Scanner) types
     private static Scanner console = new Scanner(System.in);
     private static double number;
 
     public static void main(String[] args) {
         // intro/hook to the riddle
-        System.out.println("choose any number, double it, add six, divide it in half, and subtract the number you started with. the answer is always three!");
+        System.out.println("choose any number, add five, double it, then subtract your original number twice. its always 10!");
         
         // keep asking the user until they input a number (something that evaluates to a double)
         double originalNum = askQuestion("welcome to the numbers riddle! enter a starting number to begin", Double::valueOf);
         number = originalNum;
         
-        
         // follow the steps described to prove it to the user
-        mul(2);            // double it
-        add(6);            // add six
-        mul(1 / 2.0);      // divide it in half
-        add(-originalNum); // and subtract the number you started with
+        add(5); mul(2); add(-originalNum); add(-originalNum);
         
         // return the result of the arithmetic sequence, which should be three
-        System.out.println("voila! you ended up with " + number);
+        System.out.println("voila! you ended up with " + Math.round(number));
     }
     
     // describes the process of addition/subtraction depending on the value
     private static void add(double quantity) {
+        // # CONCEPT # use of boolean expressions (quantity > 0) and if statements (if (...) {...} else {...})
         if (quantity > 0) {
             evalStartOfNumberExpr("add", quantity, '+');
-        
         } else {
             // inputs are reversed because `x - num` is better than `x + -num`
             evalStartOfNumberExpr("subtract", -quantity, '-');
@@ -77,6 +56,7 @@ public class NumbersRiddle {
     // describes the first part of the arithmetic operation to the riddle number
     // the parameters fill in the blanks of the equation
     private static void evalStartOfNumberExpr(String arithmeticDesc, double quantity, char exprType) {
+        // # CONCEPT # use of objects (String) and methods (String.format())
         // first tell that itll '<arithmeticDesc> <number> by <quantity>'
         System.out.println(String.format("lets %s %2$.1f by %3$.1f", arithmeticDesc, number, quantity));
 
