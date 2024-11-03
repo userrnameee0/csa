@@ -231,7 +231,7 @@ public class Adventure {
         while (true) {
             System.out.print("> ");
             try {
-                int choice = console.nextInt();
+                int choice = Integer.valueOf(console.nextLine());
                 if (choice >= 1 && choice <= max) {
                     System.out.println();
                     return choice - 1;
