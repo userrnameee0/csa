@@ -13,11 +13,14 @@
  |                There is only one starting point, with each subsequent choice
  |                getting closer or farther to an ending
  |
+ |                The storyline is an interpretation of taking a hike with
+ |                psychosis/schizophrenia, with the 'good' ending being one
+ |                which you balance your emotions the best
+ |
  |     Language:  Java version 8
  | Ex. Packages:  None.
  |                
- | Deficiencies:  if-else statements are nested via recursion, so theyre not
- |                found in the code as explicitly
+ | Deficiencies:  None.
  *===========================================================================*/
 
 import java.util.Scanner;
@@ -140,15 +143,31 @@ public class Adventure {
         // no `options[]` means the end has been reached
         if (totalOptions == 0) {
             return;
-        }
+            
+        } else {
+            // # REQUIREMENT # For each conditional, display a new statement and a new set of choices.
+            // after a conditional from `find` (excluding the first run of `followChoice`), a new `Choice`
+            // is selected and is displayed to the user
 
-        // display the `options[]` and associate them with their index number + 1
-        for (int i = 0; i < totalOptions; i++) {
-            System.out.printf("%d | %s\n", i + 1, location.options[i]);
+            // display the `options[]` and associate them with their index number + 1
+            int i = 0;
+            while (true) {
+                if (i < totalOptions) {
+                    System.out.printf("%d | %s\n", i + 1, location.options[i]);
+                    
+                } else {
+                    break;
+                }
+                i++;
+            }
         }
 
         // get the `option` that the user selects
         int redirectIndex = giveChoiceUpTo(totalOptions);
+
+        // # REQUIREMENT # For each if statement, present a different path to the user.
+        // the `if` statement in the `find` method presents a different `Choice` or
+        // path to the user depending on their option selected
 
         // `find`s the corresponding `Choice` from the `option`s corresponding `redirect` and follows it
         followChoice(find(choices, c -> c.name == location.redirects[redirectIndex]));
